@@ -55,12 +55,70 @@ MongoClient.connect(
     //   }
     // );
 
+    // db.collection("tasks")
+    //   .find({
+    //     completed: true,
+    //   })
+    //   .toArray((error, tasks) => {
+    //     console.log(tasks);
+    //   });
+
+    // const updatePromise = db
+    //   .collection("users")
+    //   .updateOne(
+    //     {
+    //       _id: new ObjectID("6490239eab3ca350b12a8ffe"),
+    //     },
+    //     {
+    //       $inc: {
+    //         age: 1,
+    //       },
+    //     }
+    //   )
+    //   .then((result) => {
+    //     console.log(result);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+    // const updatePromisemany = db
+    //   .collection("tasks")
+    //   .updateMany(
+    //     {
+    //       completed: true,
+    //     },
+    //     {
+    //       $set: { completed: false },
+    //     }
+    //   )
+    //   .then((result) => {
+    //     console.log(result);
+    //   })
+    //   .cathc((error) => {
+    //     console.log(error);
+    //   });
+
+    // db.collection("users")
+    //   .deleteMany({
+    //     age: 27,
+    //   })
+    //   .then((result) => {
+    //     console.log("Sucessfully Removed");
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
     db.collection("tasks")
-      .find({
-        completed: true,
+      .deleteOne({
+        description: "Lunch",
       })
-      .toArray((error, tasks) => {
-        console.log(tasks);
+      .then((result) => {
+        console.log("Deletd");
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 );
