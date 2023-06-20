@@ -120,5 +120,6 @@ MongoClient.connect(
       .catch((error) => {
         console.log(error);
       });
+    console.log("hi");
   }
 );
