@@ -115,11 +115,12 @@ MongoClient.connect(
         description: "Lunch",
       })
       .then((result) => {
+        console.log(req.body);
+
         console.log("Deletd");
       })
       .catch((error) => {
         console.log(error);
       });
-    console.log("hi");
   }
 );
