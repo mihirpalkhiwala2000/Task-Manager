@@ -1,4 +1,4 @@
-successMsgs = {
+const successMsgs = {
   sucess: "Successful",
   sucessfulLogout: "You have successfully Logged out",
   sucessfulLogoutAll: "All users logged out",
@@ -6,7 +6,7 @@ successMsgs = {
   login: "Logged in successfully",
 };
 
-errorMsgs = {
+const errorMsgs = {
   badRequest: "Invalid request. Please try again!",
   serverError: "There is an internal server error.",
   unauthorized: "Access denied, please login first",
@@ -15,7 +15,7 @@ errorMsgs = {
   passError: "Password is invalid",
   ageError: "Age must be positive",
 };
-statusCodes = {
+const statusCodes = {
   successC: 200,
   createdC: 201,
   badRequestC: 400,
@@ -23,7 +23,7 @@ statusCodes = {
   notFoundC: 404,
   serverErrorC: 500,
 };
-module.exports = {
+export default {
   successMsgs,
   errorMsgs,
   statusCodes,

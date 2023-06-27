@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 dotenv.config();
 async function generate(user) {
   const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_CODE);
@@ -10,4 +10,4 @@ async function generate(user) {
   return token;
 }
 
-module.exports = generate;
+export default generate;

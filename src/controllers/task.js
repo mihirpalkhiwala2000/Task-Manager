@@ -1,4 +1,5 @@
-function displayTask(reqQuery) {
+import Task from "../models/task.js";
+export function displayTask(reqQuery) {
   const sort = {};
   const match = {};
   if (reqQuery.completed) {
@@ -15,8 +16,7 @@ function displayTask(reqQuery) {
   return { match, sort, limit, skip };
 }
 
-function taskUpdate(updates) {
-  console.log("new place");
+export function taskUpdate(updates) {
   const allowedUpdates = ["description", "completed"];
   const isValidOperation = updates.every((update) => {
     return allowedUpdates.includes(update);
@@ -24,8 +24,18 @@ function taskUpdate(updates) {
 
   return isValidOperation;
 }
+export function createTask(task) {
+  task.save();
+}
 
-module.exports = {
-  displayTask,
-  taskUpdate,
-};
+export async function findTask(_id, reqUser) {
+  const task = await Task.findOne({ _id, owner: reqUser._id });
+  return task;
+}
+export async function taskUpdate2(_id, reqUser) {
+  const task = Task.findOne({
+    _id: _id,
+    owner: reqUser._id,
+  });
+  return task;
+}

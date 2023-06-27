@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 mongoose
-  .connect("mongodb://127.0.0.1:27017/task-manager-api", {
+  .connect(process.env.DB_PORT, {
     useNewUrlParser: true,
   })
   .then(() => console.log("Connected!"));

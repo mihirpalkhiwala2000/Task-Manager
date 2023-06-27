@@ -1,7 +1,8 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const dotenv = require("dotenv");
-const constants = require("../constant");
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
+import dotenv from "dotenv";
+import constants from "../constant.js";
+const { successMsgs, errorMsgs, statusCodes } = constants;
 const { badRequest, serverError, unauthorized, notFound } = errorMsgs;
 const {
   successC,
@@ -35,4 +36,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth;
+export default auth;

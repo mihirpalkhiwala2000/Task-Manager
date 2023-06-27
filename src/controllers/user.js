@@ -1,4 +1,4 @@
-const constants = require("../constant");
+import constants from "../constant.js";
 const { successMsgs, errorMsgs, statusCodes } = constants;
 const { sucess, sucessfulLogout, sucessfulLogoutAll, created, login } =
   successMsgs;
@@ -11,21 +11,21 @@ const {
   notFoundC,
   serverErrorC,
 } = statusCodes;
-const generate = require("../utils/generateTokensUtils");
+import generate from "../utils/generateTokensUtils.js";
 
-async function postuser(user) {
+export const postuser = async (user) => {
   const token = await generate(user);
 
   return token;
-}
+};
 
-function userLogin(user) {
+export function userLogin(user) {
   const token = generate(user);
 
   return token;
 }
 
-function updateUser(updates) {
+export function updateUser(updates) {
   const allowedUpdates = ["name", "email", "password", "age"];
 
   const isValidOperation = updates.every((update) => {
@@ -33,5 +33,3 @@ function updateUser(updates) {
   });
   return isValidOperation;
 }
-
-module.exports = { postuser, userLogin, updateUser };

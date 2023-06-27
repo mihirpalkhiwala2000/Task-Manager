@@ -1,14 +1,13 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const dotenv = require("dotenv");
+import mongoose from "mongoose";
+import validator from "validator";
+import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
 dotenv.config();
-const Task = require("./task");
-const constants = require("../constant");
+import Task from "./task.js";
+import constants from "../constant.js";
 const { successMsgs, errorMsgs, statusCodes } = constants;
 const { badRequest, emailError, passError, ageError } = errorMsgs;
-const generate = require("../utils/generateTokensUtils");
-const find = require("../utils/findUtils");
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -113,5 +112,4 @@ userSchema.pre("findOneAndDelete", async function (next) {
 });
 
 const User = mongoose.model("User", userSchema);
-
-module.exports = User;
+export default User;

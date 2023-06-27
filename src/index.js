@@ -1,10 +1,9 @@
-const express = require("express");
-require("./db/mongoose");
-
+import express from "express";
+import("./db/mongoose.js");
 const app = express();
 const port = process.env.PORT || 3000;
-const userRouter = require("./routers/users");
-const taskRouter = require("./routers/tasks");
+import userRouter from "./routers/users.js";
+import taskRouter from "./routers/tasks.js";
 
 app.use(express.json());
 app.use(userRouter);
@@ -14,8 +13,8 @@ app.listen(port, () => {
   console.log("Server is up on port " + port);
 });
 
-const Task = require("./models/task");
-const User = require("./models/user");
+import Task from "./models/task.js";
+import User from "./models/user.js";
 
 const main = async () => {
   const user = await User.findById("649a65363773927a831e80e9");
