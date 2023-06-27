@@ -6,22 +6,6 @@ const port = process.env.PORT || 3000;
 const userRouter = require("./routers/users");
 const taskRouter = require("./routers/tasks");
 
-// app.use((req, res, next) => {
-//   if (req.method === "GET") {
-//     res.send("GET requests are disabled");
-//   } else {
-//     next();
-//   }
-// });
-
-// app.use((req, res, next) => {
-//   if (req) {
-//     res.status(503).send("Site is under maintainance");
-//   } else {
-//     next();
-//   }
-// });
-
 app.use(express.json());
 app.use(userRouter);
 app.use(taskRouter);

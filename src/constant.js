@@ -1,27 +1,30 @@
-successmsgs = {
-  sucesstext: "Successful",
-  sucessfullogout: "You have successfully Logged out",
-  sucessfullogoutall: "All users logged out",
-  createdtext: "Created Sucessfully",
-  loginmsg: "Logged in successfully",
+successMsgs = {
+  sucess: "Successful",
+  sucessfulLogout: "You have successfully Logged out",
+  sucessfulLogoutAll: "All users logged out",
+  created: "Created Sucessfully",
+  login: "Logged in successfully",
 };
 
-errormsgs = {
-  badrequestmsg: "Invalid request. Please try again!",
-  servererrormsg: "There is an internal server error.",
-  unauthorizedmsg: "Access denied, please login first",
-  notfoundmsg: "Nothing relevant found. Please try again.",
+errorMsgs = {
+  badRequest: "Invalid request. Please try again!",
+  serverError: "There is an internal server error.",
+  unauthorized: "Access denied, please login first",
+  notFound: "Nothing relevant found. Please try again.",
+  emailError: "Email is invalid",
+  passError: "Password is invalid",
+  ageError: "Age must be positive",
 };
 statusCodes = {
-  successcode: 200,
-  createdcode: 201,
-  badrequestcode: 400,
-  unauthorizedcode: 401,
-  notfoundcode: 404,
-  servererrorcode: 500,
+  successC: 200,
+  createdC: 201,
+  badRequestC: 400,
+  unauthorizedC: 401,
+  notFoundC: 404,
+  serverErrorC: 500,
 };
 module.exports = {
-  successmsgs,
-  errormsgs,
+  successMsgs,
+  errorMsgs,
   statusCodes,
 };

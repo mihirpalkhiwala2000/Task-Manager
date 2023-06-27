@@ -3,38 +3,47 @@ const User = require("../models/user");
 const router = new express.Router();
 const auth = require("../middleware/auth");
 const constants = require("../constant");
+const { successMsgs, errorMsgs, statusCodes } = constants;
+const { sucess, sucessfulLogout, sucessfulLogoutAll, created, login } =
+  successMsgs;
+const { badRequest, serverError, unauthorized, notFound } = errorMsgs;
+const {
+  successC,
+  createdC,
+  badRequestC,
+  unauthorizedC,
+  notFoundC,
+  serverErrorC,
+} = statusCodes;
+const { postuser, userLogin, updateUser } = require("../controllers/user");
+const findUser = require("../utils/findUtils");
 
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
 
   try {
     await user.save();
-    const token = await user.generateAuthToken();
-    const status = constants.statusCodes.createdcode;
+    const token = postuser(user);
 
-    res.send(status, {
+    res.status(createdC).send({
       user,
       token,
-      status,
-      message: constants.successmsgs.createdtext,
+      message: created,
     });
   } catch (e) {
-    res.status(constants.statusCodes.badrequestcode).send(e);
+    res.status(badRequestC).send(badRequest);
   }
 });
 
 router.post("/users/login", async (req, res) => {
   try {
-    const user = await User.findByCredentials(
-      req.body.email,
-      req.body.password
-    );
-    const token = await user.generateAuthToken();
-    res.send({ user: user, token, message: constants.successmsgs.loginmsg });
+    const { email, password } = req.body;
+    const user = await User.findByCredentials(email, password);
+    const token = await userLogin(user);
+
+    res.send({ user: user, token, message: login });
   } catch (e) {
-    resloginmsg
-      .status(constants.statusCodes.badrequestcode)
-      .send(constants.errormsgs.badrequestmsg);
+    res.status(badRequestC).send(badRequest);
   }
 });
 
@@ -44,11 +53,9 @@ router.post("/users/logout", auth, async (req, res) => {
       return token.token !== req.token;
     });
     await req.user.save();
-    res.send(constants.successmsgs.sucessfullogout);
+    res.send(sucessfulLogout);
   } catch (e) {
-    res
-      .status(constants.statusCodes.servererrorcode)
-      .send(constants.errormsgs.servererrormsg);
+    res.status(serverErrorC).send(serverError);
   }
 });
 
@@ -56,49 +63,21 @@ router.post("/users/logoutAll", auth, async (req, res) => {
   try {
     req.user.tokens = [];
     await req.user.save();
-    res.send(constants.successmsgs.sucessfullogoutall);
+    res.send(sucessfulLogoutAll);
   } catch (e) {
-    res
-      .status(constants.statusCodes.servererrorcode)
-      .send(constants.errormsgs.servererrormsg);
+    res.status(serverErrorC).send(serverError);
   }
 });
 
 router.get("/users/me", auth, async (req, res) => {
-  // try {
-  //   const users = await User.find({});
-  //   res.send(users);
-  // } catch (e) {
-  //   res.status(500).send();
-  // }
-
   res.send(req.user);
 });
 
-// router.get("/users/:id", async (req, res) => {
-//   const _id = req.params.id;
-//   try {
-//     const user = await User.findById(_id);
-
-//     if (!user) {
-//       return res.status(404).send();
-//     }
-//     res.send(user);
-//   } catch (e) {
-//     res.status(500).send();
-//   }
-// });
-
 router.patch("/users/me", auth, async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "age"];
-  const isValidOperation = updates.every((update) => {
-    return allowedUpdates.includes(update);
-  });
+  const isValidOperation = updateUser(updates);
   if (!isValidOperation) {
-    return res
-      .status(constants.statusCodes.badrequestcode)
-      .send(constants.errormsgs.badrequestmsg);
+    return res.status(badRequestC).send(badRequest);
   }
   try {
     const user = req.user;
@@ -107,16 +86,9 @@ router.patch("/users/me", auth, async (req, res) => {
 
     await user.save();
 
-    // const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    //   new: true,
-    //   runValidators: true,
-    // });
-
     res.send(user);
   } catch (e) {
-    res
-      .status(constants.statusCodes.badrequestcode)
-      .send(constants.errormsgs.badrequestmsg);
+    res.status(badRequestC).send(badRequest);
   }
 });
 
@@ -125,13 +97,9 @@ router.delete("/users/me", auth, async (req, res) => {
     const user = await User.findOneAndDelete({
       _id: req.user._id,
     });
-
-    // await req.user.findOneAndDelete();
     res.send(req.user);
   } catch (e) {
-    res
-      .status(constants.statusCodes.servererrorcode)
-      .send(constants.errormsgs.servererrormsg);
+    res.status(serverErrorC).send(serverError);
   }
 });
 

@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 const Task = require("./task");
-
+const constants = require("../constant");
+const { successMsgs, errorMsgs, statusCodes } = constants;
+const { badRequest, emailError, passError, ageError } = errorMsgs;
+const generate = require("../utils/generateTokensUtils");
+const find = require("../utils/findUtils");
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -22,7 +25,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate(value) {
         if (!validator.isEmail(value)) {
-          throw new Error("Email is invalid");
+          throw new Error(emailError);
         }
       },
     },
@@ -33,7 +36,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate(value) {
         if (value.toLowerCase().includes("password")) {
-          throw new Error("Password cannot contain password");
+          throw new Error(passError);
         }
       },
     },
@@ -42,7 +45,7 @@ const userSchema = new mongoose.Schema(
       default: 0,
       validate(value) {
         if (value < 0) {
-          throw new Error("Age must be a positive number");
+          throw new Error(ageError);
         }
       },
     },
@@ -74,15 +77,6 @@ userSchema.methods.toJSON = function () {
   delete userObject.tokens;
   return userObject;
 };
-userSchema.methods.generateAuthToken = async function () {
-  const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_CODE);
-
-  user.tokens = user.tokens.concat({ token });
-  await user.save();
-
-  return token;
-};
 
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
@@ -98,8 +92,6 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user;
 };
 
-// Delete user task when user is removed
-
 // Hash the password before saving
 userSchema.pre("save", async function (next) {
   const user = this;
@@ -110,10 +102,10 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
+
+// Delete user task when user is removed
 userSchema.pre("findOneAndDelete", async function (next) {
-  console.log("Hiii");
   const user = this;
-  console.log("🚀 ~ file: user.js:111 ~ this:", user._conditions._id);
 
   await Task.deleteMany({ owner: user._conditions._id });
 

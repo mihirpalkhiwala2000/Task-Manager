@@ -3,9 +3,23 @@ const router = new express.Router();
 const auth = require("../middleware/auth");
 const Task = require("../models/task");
 const constants = require("../constant");
+const { successMsgs, errorMsgs, statusCodes } = constants;
+const { sucess, sucessfulLogout, sucessfulLogoutAll, created, login } =
+  successMsgs;
+const { badRequest, serverError, unauthorized, notFound } = errorMsgs;
+const {
+  successC,
+  createdC,
+  badRequestC,
+  unauthorizedC,
+  notFoundC,
+  serverErrorC,
+} = statusCodes;
+const { displayTask, taskUpdate } = require("../controllers/task");
 
 router.post("/tasks", auth, (req, res) => {
   //const task = new Task(req.body);
+
   const task = new Task({
     ...req.body,
     owner: req.user._id,
@@ -13,45 +27,32 @@ router.post("/tasks", auth, (req, res) => {
   task
     .save()
     .then(() => {
-      res
-        .status(constants.statusCodes.createdcode)
-        .send({ task, message: constants.successmsgs.sucesstext });
+      res.status(createdC).send({ task, message: sucess });
     })
     .catch((e) => {
-      res
-        .status(constants.statusCodes.badrequestcode)
-        .send(constants.errormsgs.badrequestmsg);
+      res.status(badRequestC).send(badRequest);
     });
 });
 
 router.get("/tasks", auth, async (req, res) => {
-  const sort = {};
-  const match = {};
-  if (req.query.completed) {
-    match.completed = req.query.completed === "true";
-  }
-
-  if (req.query.sortBy) {
-    const parts = req.query.sortBy.split(":");
-    sort[parts[0]] = parts[1] === "desc" ? -1 : 1;
-  }
-
+  const reqQuery = req.query;
+  const reqUser = req.user;
+  const { match, sort, limit, skip } = displayTask(reqQuery);
+  console.log(match);
   try {
-    await req.user.populate({
+    await reqUser.populate({
       path: "tasks",
       match,
       options: {
-        limit: parseInt(req.query.limit),
-        skip: parseInt(req.query.skip),
+        limit: limit,
+        skip: skip,
         sort,
       },
     });
 
-    res.send(req.user.tasks);
+    res.send(reqUser.tasks);
   } catch (e) {
-    res
-      .status(constants.statusCodes.servererrorcode)
-      .send(constants.errormsgs.servererrormsg);
+    res.status(serverErrorC).send(serverError);
   }
 });
 
@@ -60,29 +61,19 @@ router.get("/tasks/:id", auth, async (req, res) => {
   try {
     const task = await Task.findOne({ _id, owner: req.user._id });
     if (!task) {
-      return res
-        .status(constants.statusCodes.notfoundcode)
-        .send(constants.errormsgs.notfoundmsg);
+      return res.status(notFoundC).send(notFound);
     }
 
     res.send(task);
   } catch (e) {}
-  res
-    .status(constants.statusCodes.servererrorcode)
-    .send(constants.errormsgs.servererrormsg);
+  res.status(serverErrorC).send(serverError);
 });
 
 router.patch("/tasks/:id", auth, async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["description", "completed"];
-  const isValidOperation = updates.every((update) => {
-    return allowedUpdates.includes(update);
-  });
-
+  const isValidOperation = taskUpdate(updates);
   if (!isValidOperation) {
-    return res
-      .status(constants.statusCodes.badrequestcode)
-      .send(constants.errormsgs.badrequestmsg);
+    return res.status(badRequestC).send(badRequest);
   }
   try {
     const task = await Task.findOne({
@@ -90,22 +81,14 @@ router.patch("/tasks/:id", auth, async (req, res) => {
       owner: req.user._id,
     });
 
-    // const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
-    //   new: true,
-    //   runValidators: true,
-    // });
     if (!task) {
-      return res
-        .status(constants.statusCodes.notfoundcode)
-        .send(constants.errormsgs.notfoundmsg);
+      return res.status(notFoundC).send(notFound);
     }
     updates.forEach((update) => (task[update] = req.body[update]));
     await task.save();
     res.send(task);
   } catch (e) {
-    res
-      .status(constants.statusCodes.badrequestcode)
-      .send(constants.errormsgs.badrequestmsg);
+    res.status(badRequestC).send(badRequest);
   }
 });
 
@@ -117,15 +100,11 @@ router.delete("/tasks/:id", auth, async (req, res) => {
     });
 
     if (!task) {
-      return res
-        .status(constants.statusCodes.notfoundcode)
-        .send(constants.errormsgs.notfoundmsg);
+      return res.status(notFoundC).send(notFound);
     }
     res.send(task);
   } catch (e) {
-    res
-      .status(constants.statusCodes.servererrorcode)
-      .send(constants.errormsgs.servererrormsg);
+    res.status(serverErrorC).send(serverError);
   }
 });
 
