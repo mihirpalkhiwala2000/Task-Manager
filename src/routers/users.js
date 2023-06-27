@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/user");
 const router = new express.Router();
 const auth = require("../middleware/auth");
+const constants = require("../constant");
 
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
@@ -9,9 +10,16 @@ router.post("/users", async (req, res) => {
   try {
     await user.save();
     const token = await user.generateAuthToken();
-    res.status(201).send({ user, token });
+    const status = constants.statusCodes.createdcode;
+
+    res.send(status, {
+      user,
+      token,
+      status,
+      message: constants.successmsgs.createdtext,
+    });
   } catch (e) {
-    res.status(400).send(e);
+    res.status(constants.statusCodes.badrequestcode).send(e);
   }
 });
 
@@ -22,9 +30,11 @@ router.post("/users/login", async (req, res) => {
       req.body.password
     );
     const token = await user.generateAuthToken();
-    res.send({ user: user, token });
+    res.send({ user: user, token, message: constants.successmsgs.loginmsg });
   } catch (e) {
-    res.status(400).send();
+    resloginmsg
+      .status(constants.statusCodes.badrequestcode)
+      .send(constants.errormsgs.badrequestmsg);
   }
 });
 
@@ -34,9 +44,11 @@ router.post("/users/logout", auth, async (req, res) => {
       return token.token !== req.token;
     });
     await req.user.save();
-    res.send();
+    res.send(constants.successmsgs.sucessfullogout);
   } catch (e) {
-    res.status(500).send();
+    res
+      .status(constants.statusCodes.servererrorcode)
+      .send(constants.errormsgs.servererrormsg);
   }
 });
 
@@ -44,9 +56,11 @@ router.post("/users/logoutAll", auth, async (req, res) => {
   try {
     req.user.tokens = [];
     await req.user.save();
-    res.send();
+    res.send(constants.successmsgs.sucessfullogoutall);
   } catch (e) {
-    res.status(500).send();
+    res
+      .status(constants.statusCodes.servererrorcode)
+      .send(constants.errormsgs.servererrormsg);
   }
 });
 
@@ -82,9 +96,10 @@ router.patch("/users/me", auth, async (req, res) => {
     return allowedUpdates.includes(update);
   });
   if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid Updates!" });
+    return res
+      .status(constants.statusCodes.badrequestcode)
+      .send(constants.errormsgs.badrequestmsg);
   }
-
   try {
     const user = req.user;
 
@@ -99,7 +114,9 @@ router.patch("/users/me", auth, async (req, res) => {
 
     res.send(user);
   } catch (e) {
-    res.status(400).send(e);
+    res
+      .status(constants.statusCodes.badrequestcode)
+      .send(constants.errormsgs.badrequestmsg);
   }
 });
 
@@ -108,11 +125,13 @@ router.delete("/users/me", auth, async (req, res) => {
     const user = await User.findOneAndDelete({
       _id: req.user._id,
     });
-    console.log("Hii");
+
     // await req.user.findOneAndDelete();
     res.send(req.user);
   } catch (e) {
-    res.status(500).send(e);
+    res
+      .status(constants.statusCodes.servererrorcode)
+      .send(constants.errormsgs.servererrormsg);
   }
 });
 

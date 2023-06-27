@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const dotenv = require("dotenv");
+const constants = require("../constant");
 dotenv.config();
 
 const auth = async (req, res, next) => {
@@ -21,7 +22,9 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (e) {
-    res.status(401).send({ error: "Please authenticate" });
+    res
+      .status(constants.statusCodes.unauthorizedcode)
+      .send(constants.errormsgs.unauthorizedmsg);
   }
 };
 
