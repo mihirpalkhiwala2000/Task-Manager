@@ -1,5 +1,5 @@
 import express from "express";
-import User from "../models/user.js";
+import User from "../models/user-models.js";
 const userRouter = new express.Router();
 export default userRouter;
 import auth from "../middleware/auth.js";
@@ -16,14 +16,18 @@ const {
   notFoundC,
   serverErrorC,
 } = statusCodes;
-import { postuser, userLogin, updateUser } from "../controllers/user.js";
+import {
+  postuser,
+  userLogin,
+  updateUser,
+  loginUser,
+  updateUser2,
+  deleteUser,
+} from "../controllers/user-controller.js";
 
-userRouter.post("/users", async (req, res) => {
-  const user = new User(req.body);
-
+userRouter.post("", async (req, res) => {
   try {
-    await user.save();
-    const token = postuser(user);
+    const { user, token } = await postuser(req.body);
 
     res.status(createdC).send({
       user,
@@ -35,11 +39,10 @@ userRouter.post("/users", async (req, res) => {
   }
 });
 
-userRouter.post("/users/login", async (req, res) => {
+userRouter.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findByCredentials(email, password);
-    const token = await userLogin(user);
+    const { user, token } = await loginUser(email, password);
 
     res.send({ user: user, token, message: login });
   } catch (e) {
@@ -47,7 +50,7 @@ userRouter.post("/users/login", async (req, res) => {
   }
 });
 
-userRouter.post("/users/logout", auth, async (req, res) => {
+userRouter.post("/logout", auth, async (req, res) => {
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
       return token.token !== req.token;
@@ -59,7 +62,7 @@ userRouter.post("/users/logout", auth, async (req, res) => {
   }
 });
 
-userRouter.post("/users/logoutAll", auth, async (req, res) => {
+userRouter.post("/logoutAll", auth, async (req, res) => {
   try {
     req.user.tokens = [];
     await req.user.save();
@@ -69,11 +72,11 @@ userRouter.post("/users/logoutAll", auth, async (req, res) => {
   }
 });
 
-userRouter.get("/users/me", auth, async (req, res) => {
+userRouter.get("/me", auth, async (req, res) => {
   res.send(req.user);
 });
 
-userRouter.patch("/users/me", auth, async (req, res) => {
+userRouter.patch("/me", auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const isValidOperation = updateUser(updates);
   if (!isValidOperation) {
@@ -81,10 +84,7 @@ userRouter.patch("/users/me", auth, async (req, res) => {
   }
   try {
     const user = req.user;
-
-    updates.forEach((update) => (user[update] = req.body[update]));
-
-    await user.save();
+    const retuser = updateUser2(updates, user, req.body);
 
     res.send(user);
   } catch (e) {
@@ -92,11 +92,9 @@ userRouter.patch("/users/me", auth, async (req, res) => {
   }
 });
 
-userRouter.delete("/users/me", auth, async (req, res) => {
+userRouter.delete("/me", auth, async (req, res) => {
   try {
-    const user = await User.findOneAndDelete({
-      _id: req.user._id,
-    });
+    deleteUser(req.user._id);
     res.send(req.user);
   } catch (e) {
     res.status(serverErrorC).send(serverError);

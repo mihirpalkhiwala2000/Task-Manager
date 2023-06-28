@@ -1,4 +1,4 @@
-import Task from "../models/task.js";
+import Task from "../models/task-models.js";
 export function displayTask(reqQuery) {
   const sort = {};
   const match = {};
@@ -37,5 +37,24 @@ export async function taskUpdate2(_id, reqUser) {
     _id: _id,
     owner: reqUser._id,
   });
+  return task;
+}
+export async function taskUpdate3(task, updates, reqBody) {
+  updates.forEach((update) => (task[update] = reqBody[update]));
+  await task.save();
+
+  return task;
+}
+
+export function displayPartiTask(_id, reqUser) {
+  return findTask(_id, reqUser);
+}
+
+export async function deleteTask(id, user_id) {
+  const task = await Task.findOneAndDelete({
+    _id: id,
+    owner: user_id,
+  });
+
   return task;
 }

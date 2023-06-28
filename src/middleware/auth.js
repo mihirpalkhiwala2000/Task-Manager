@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user.js";
+import User from "../models/user-models.js";
 import dotenv from "dotenv";
 import constants from "../constant.js";
 const { successMsgs, errorMsgs, statusCodes } = constants;

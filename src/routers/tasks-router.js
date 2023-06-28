@@ -1,8 +1,9 @@
-import express from "express";
+import express, { application } from "express";
 const taskRouter = new express.Router();
+const app = express();
 export default taskRouter;
 import auth from "../middleware/auth.js";
-import Task from "../models/task.js";
+import Task from "../models/task-models.js";
 import constants from "../constant.js";
 const { successMsgs, errorMsgs, statusCodes } = constants;
 const { sucess, sucessfulLogout, sucessfulLogoutAll, created, login } =
@@ -22,9 +23,14 @@ import {
   createTask,
   findTask,
   taskUpdate2,
-} from "../controllers/task.js";
+  displayPartiTask,
+  taskUpdate3,
+  deleteTask,
+} from "../controllers/task-controller.js";
 
-taskRouter.post("/tasks", auth, (req, res) => {
+app.route("/tasks");
+
+taskRouter.post("", auth, (req, res) => {
   //const task = new Task(req.body);
 
   const task = new Task({
@@ -40,7 +46,7 @@ taskRouter.post("/tasks", auth, (req, res) => {
   }
 });
 
-taskRouter.get("/tasks", auth, async (req, res) => {
+taskRouter.get("", auth, async (req, res) => {
   const reqQuery = req.query;
   const reqUser = req.user;
   const { match, sort, limit, skip } = displayTask(reqQuery);
@@ -62,20 +68,22 @@ taskRouter.get("/tasks", auth, async (req, res) => {
   }
 });
 
-taskRouter.get("/tasks/:id", auth, async (req, res) => {
+taskRouter.get("/:id", auth, async (req, res) => {
   const _id = req.params.id;
   try {
-    const task = await findTask(_id, req.user);
+    const task = await displayPartiTask(_id, req.user);
+
     if (!task) {
       return res.status(notFoundC).send(notFound);
     }
 
-    res.send(task);
+    return res.send(task);
   } catch (e) {}
+
   res.status(serverErrorC).send(serverError);
 });
 
-taskRouter.patch("/tasks/:id", auth, async (req, res) => {
+taskRouter.patch("/:id", auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const isValidOperation = taskUpdate(updates);
   if (!isValidOperation) {
@@ -86,24 +94,19 @@ taskRouter.patch("/tasks/:id", auth, async (req, res) => {
     const task = await taskUpdate2(_id, req.user);
 
     if (!task) {
-      console.log("🚀 ~ file: tasks.js:89 ~ taskRouter.patch ~ task:", task);
-
       return res.status(notFoundC).send(notFound);
     }
-    updates.forEach((update) => (task[update] = req.body[update]));
-    await task.save();
-    res.send(task);
+    const rettask = await taskUpdate3(task, updates, req.body);
+
+    res.send(rettask);
   } catch (e) {
     res.status(badRequestC).send(badRequest);
   }
 });
 
-taskRouter.delete("/tasks/:id", auth, async (req, res) => {
+taskRouter.delete("/:id", auth, async (req, res) => {
   try {
-    const task = await Task.findOneAndDelete({
-      _id: req.params.id,
-      owner: req.user._id,
-    });
+    const task = await deleteTask(req.params.id, req.user._id);
 
     if (!task) {
       return res.status(notFoundC).send(notFound);
