@@ -2,16 +2,9 @@ import jwt from "jsonwebtoken";
 import User from "../models/user-models.js";
 import dotenv from "dotenv";
 import constants from "../constant.js";
-const { successMsgs, errorMsgs, statusCodes } = constants;
-const { badRequest, serverError, unauthorized, notFound } = errorMsgs;
-const {
-  successC,
-  createdC,
-  badRequestC,
-  unauthorizedC,
-  notFoundC,
-  serverErrorC,
-} = statusCodes;
+const { errorMsgs, statusCodes } = constants;
+const { unauthorized } = errorMsgs;
+const { unauthorizedC } = statusCodes;
 dotenv.config();
 
 const auth = async (req, res, next) => {

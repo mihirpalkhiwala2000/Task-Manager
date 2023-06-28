@@ -40,7 +40,7 @@ export async function loginUser(email, password) {
 }
 
 export async function deleteUser(requser_id) {
-  const user = await User.findOneAndDelete({
+  await User.findOneAndDelete({
     _id: requser_id,
   });
 }
