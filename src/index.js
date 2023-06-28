@@ -12,13 +12,3 @@ app.use("/tasks", taskRouter);
 app.listen(port, () => {
   console.log("Server is up on port " + port);
 });
-
-import Task from "./models/task-models.js";
-import User from "./models/user-models.js";
-
-const main = async () => {
-  const user = await User.findById("649a65363773927a831e80e9");
-
-  await user.populate("tasks");
-};
-main();

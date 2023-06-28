@@ -1,8 +1,8 @@
 const successMsgs = {
-  sucess: "Successful",
-  sucessfulLogout: "You have successfully Logged out",
-  sucessfulLogoutAll: "All users logged out",
-  created: "Created Sucessfully",
+  success: "Successful",
+  successfulLogout: "You have successfully Logged out",
+  successfulLogoutAll: "All users logged out",
+  created: "Created successfully",
   login: "Logged in successfully",
 };
 

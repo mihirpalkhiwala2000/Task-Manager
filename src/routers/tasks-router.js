@@ -1,4 +1,4 @@
-import express, { application } from "express";
+import express from "express";
 const taskRouter = new express.Router();
 const app = express();
 export default taskRouter;
@@ -6,25 +6,16 @@ import auth from "../middleware/auth.js";
 import Task from "../models/task-models.js";
 import constants from "../constant.js";
 const { successMsgs, errorMsgs, statusCodes } = constants;
-const { sucess, sucessfulLogout, sucessfulLogoutAll, created, login } =
-  successMsgs;
-const { badRequest, serverError, unauthorized, notFound } = errorMsgs;
-const {
-  successC,
-  createdC,
-  badRequestC,
-  unauthorizedC,
-  notFoundC,
-  serverErrorC,
-} = statusCodes;
+const { success } = successMsgs;
+const { badRequest, serverError, notFound } = errorMsgs;
+const { createdC, badRequestC, notFoundC, serverErrorC } = statusCodes;
 import {
   displayTask,
-  taskUpdate,
+  validation,
   createTask,
-  findTask,
-  taskUpdate2,
+  findingUser,
   displayPartiTask,
-  taskUpdate3,
+  taskUpdate,
   deleteTask,
 } from "../controllers/task-controller.js";
 
@@ -40,7 +31,7 @@ taskRouter.post("", auth, (req, res) => {
 
   try {
     createTask(task);
-    res.status(createdC).send({ task, message: sucess });
+    res.status(createdC).send({ data: task, message: success });
   } catch (e) {
     res.status(badRequestC).send(badRequest);
   }
@@ -62,7 +53,7 @@ taskRouter.get("", auth, async (req, res) => {
       },
     });
 
-    res.send(reqUser.tasks);
+    res.send({ data: reqUser.tasks });
   } catch (e) {
     res.status(serverErrorC).send(serverError);
   }
@@ -77,7 +68,7 @@ taskRouter.get("/:id", auth, async (req, res) => {
       return res.status(notFoundC).send(notFound);
     }
 
-    return res.send(task);
+    return res.send({ data: task });
   } catch (e) {}
 
   res.status(serverErrorC).send(serverError);
@@ -85,20 +76,20 @@ taskRouter.get("/:id", auth, async (req, res) => {
 
 taskRouter.patch("/:id", auth, async (req, res) => {
   const updates = Object.keys(req.body);
-  const isValidOperation = taskUpdate(updates);
+  const isValidOperation = validation(updates);
   if (!isValidOperation) {
     return res.status(badRequestC).send(badRequest);
   }
   try {
     const _id = req.params.id;
-    const task = await taskUpdate2(_id, req.user);
+    const task = await findingUser(_id, req.user);
 
     if (!task) {
       return res.status(notFoundC).send(notFound);
     }
-    const rettask = await taskUpdate3(task, updates, req.body);
+    const rettask = await taskUpdate(task, updates, req.body);
 
-    res.send(rettask);
+    res.send({ data: rettask });
   } catch (e) {
     res.status(badRequestC).send(badRequest);
   }
@@ -111,7 +102,7 @@ taskRouter.delete("/:id", auth, async (req, res) => {
     if (!task) {
       return res.status(notFoundC).send(notFound);
     }
-    res.send(task);
+    res.send({ data: task });
   } catch (e) {
     res.status(serverErrorC).send(serverError);
   }

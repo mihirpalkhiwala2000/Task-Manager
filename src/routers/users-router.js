@@ -1,27 +1,17 @@
 import express from "express";
-import User from "../models/user-models.js";
 const userRouter = new express.Router();
 export default userRouter;
 import auth from "../middleware/auth.js";
 import constants from "../constant.js";
 const { successMsgs, errorMsgs, statusCodes } = constants;
-const { sucess, sucessfulLogout, sucessfulLogoutAll, created, login } =
-  successMsgs;
-const { badRequest, serverError, unauthorized, notFound } = errorMsgs;
-const {
-  successC,
-  createdC,
-  badRequestC,
-  unauthorizedC,
-  notFoundC,
-  serverErrorC,
-} = statusCodes;
+const { successfulLogout, successfulLogoutAll, created, login } = successMsgs;
+const { badRequest, serverError } = errorMsgs;
+const { createdC, badRequestC, serverErrorC } = statusCodes;
 import {
   postuser,
-  userLogin,
-  updateUser,
+  validateUser,
   loginUser,
-  updateUser2,
+  updateUser,
   deleteUser,
 } from "../controllers/user-controller.js";
 
@@ -30,8 +20,8 @@ userRouter.post("", async (req, res) => {
     const { user, token } = await postuser(req.body);
 
     res.status(createdC).send({
-      user,
-      token,
+      data: user,
+      token: token,
       message: created,
     });
   } catch (e) {
@@ -56,7 +46,7 @@ userRouter.post("/logout", auth, async (req, res) => {
       return token.token !== req.token;
     });
     await req.user.save();
-    res.send(sucessfulLogout);
+    res.send(successfulLogout);
   } catch (e) {
     res.status(serverErrorC).send(serverError);
   }
@@ -64,29 +54,27 @@ userRouter.post("/logout", auth, async (req, res) => {
 
 userRouter.post("/logoutAll", auth, async (req, res) => {
   try {
-    req.user.tokens = [];
     await req.user.save();
-    res.send(sucessfulLogoutAll);
+    res.send(successfulLogoutAll);
   } catch (e) {
     res.status(serverErrorC).send(serverError);
   }
 });
 
 userRouter.get("/me", auth, async (req, res) => {
-  res.send(req.user);
+  res.send({ data: req.user });
 });
 
 userRouter.patch("/me", auth, async (req, res) => {
   const updates = Object.keys(req.body);
-  const isValidOperation = updateUser(updates);
+  const isValidOperation = validateUser(updates);
   if (!isValidOperation) {
     return res.status(badRequestC).send(badRequest);
   }
   try {
     const user = req.user;
-    const retuser = updateUser2(updates, user, req.body);
-
-    res.send(user);
+    const retuser = await updateUser(updates, user, req.body);
+    res.send({ data: retuser });
   } catch (e) {
     res.status(badRequestC).send(badRequest);
   }
@@ -95,7 +83,7 @@ userRouter.patch("/me", auth, async (req, res) => {
 userRouter.delete("/me", auth, async (req, res) => {
   try {
     deleteUser(req.user._id);
-    res.send(req.user);
+    res.send({ data: req.user });
   } catch (e) {
     res.status(serverErrorC).send(serverError);
   }

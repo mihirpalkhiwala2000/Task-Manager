@@ -16,7 +16,7 @@ export function displayTask(reqQuery) {
   return { match, sort, limit, skip };
 }
 
-export function taskUpdate(updates) {
+export function validation(updates) {
   const allowedUpdates = ["description", "completed"];
   const isValidOperation = updates.every((update) => {
     return allowedUpdates.includes(update);
@@ -32,14 +32,14 @@ export async function findTask(_id, reqUser) {
   const task = await Task.findOne({ _id, owner: reqUser._id });
   return task;
 }
-export async function taskUpdate2(_id, reqUser) {
+export async function findingUser(_id, reqUser) {
   const task = Task.findOne({
     _id: _id,
     owner: reqUser._id,
   });
   return task;
 }
-export async function taskUpdate3(task, updates, reqBody) {
+export async function taskUpdate(task, updates, reqBody) {
   updates.forEach((update) => (task[update] = reqBody[update]));
   await task.save();
 

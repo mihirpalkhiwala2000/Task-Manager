@@ -1,17 +1,4 @@
-import constants from "../constant.js";
 import User from "../models/user-models.js";
-const { successMsgs, errorMsgs, statusCodes } = constants;
-const { sucess, sucessfulLogout, sucessfulLogoutAll, created, login } =
-  successMsgs;
-const { badRequest, serverError, unauthorized, notFound } = errorMsgs;
-const {
-  successC,
-  createdC,
-  badRequestC,
-  unauthorizedC,
-  notFoundC,
-  serverErrorC,
-} = statusCodes;
 import generate from "../utils/generateTokensUtils.js";
 
 export const postuser = async (reqBody) => {
@@ -28,7 +15,7 @@ export function userLogin(user) {
   return token;
 }
 
-export function updateUser(updates) {
+export function validateUser(updates) {
   const allowedUpdates = ["name", "email", "password", "age"];
 
   const isValidOperation = updates.every((update) => {
@@ -37,7 +24,7 @@ export function updateUser(updates) {
   return isValidOperation;
 }
 
-export async function updateUser2(updates, user, reqBody) {
+export async function updateUser(updates, user, reqBody) {
   updates.forEach((update) => (user[update] = reqBody[update]));
 
   await user.save();
