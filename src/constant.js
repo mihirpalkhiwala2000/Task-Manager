@@ -1,11 +1,11 @@
-export const successMsgs = {
+const successMsgs = {
   success: "Successful",
   successfulLogout: "You have successfully Logged out",
   created: "Created successfully",
   login: "Logged in successfully",
 };
 
-export const errorMsgs = {
+const errorMsgs = {
   badRequest: "Invalid request. Please try again!",
   serverError: "There is an internal server error.",
   unauthorized: "Access denied, please login first",
@@ -14,11 +14,16 @@ export const errorMsgs = {
   passError: "Password is invalid",
   ageError: "Age must be positive",
 };
-export const statusCodes = {
+const statusCodes = {
   successC: 200,
   createdC: 201,
   badRequestC: 400,
   unauthorizedC: 401,
   notFoundC: 404,
   serverErrorC: 500,
+};
+export default {
+  successMsgs,
+  errorMsgs,
+  statusCodes,
 };

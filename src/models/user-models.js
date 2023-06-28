@@ -3,8 +3,8 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import Task from "./task-models.js";
 import constants from "../constant.js";
-const { successMsgs, errorMsgs, statusCodes } = constants;
-const { badRequest, emailError, passError, ageError } = errorMsgs;
+const { errorMsgs } = constants;
+const { emailError, passError, ageError } = errorMsgs;
 
 const userSchema = new mongoose.Schema(
   {
