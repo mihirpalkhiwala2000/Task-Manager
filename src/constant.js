@@ -1,7 +1,6 @@
 export const successMsgs = {
   success: "Successful",
   successfulLogout: "You have successfully Logged out",
-  successfulLogoutAll: "All users logged out",
   created: "Created successfully",
   login: "Logged in successfully",
 };

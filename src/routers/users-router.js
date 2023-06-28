@@ -4,7 +4,7 @@ export default userRouter;
 import auth from "../middleware/auth.js";
 import constants from "../constant.js";
 const { successMsgs, errorMsgs, statusCodes } = constants;
-const { successfulLogout, successfulLogoutAll, created, login } = successMsgs;
+const { successfulLogout, created, login } = successMsgs;
 const { badRequest, serverError } = errorMsgs;
 const { createdC, badRequestC, serverErrorC } = statusCodes;
 import {
@@ -47,15 +47,6 @@ userRouter.post("/logout", auth, async (req, res) => {
     });
     await req.user.save();
     res.send(successfulLogout);
-  } catch (e) {
-    res.status(serverErrorC).send(serverError);
-  }
-});
-
-userRouter.post("/logoutAll", auth, async (req, res) => {
-  try {
-    await req.user.save();
-    res.send(successfulLogoutAll);
   } catch (e) {
     res.status(serverErrorC).send(serverError);
   }
